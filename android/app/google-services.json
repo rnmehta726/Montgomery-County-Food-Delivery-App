@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "654963857570",
+    "firebase_url": "https://firemcfb.firebaseio.com",
+    "project_id": "firemcfb",
+    "storage_bucket": "firemcfb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:654963857570:android:c4526eaf56293051275ffb",
+        "android_client_info": {
+          "package_name": "com.mehtarohan.testing_firebase2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "654963857570-utfm209evgrimgqj0m6ne5k1ro1neo1g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCIasB_4cIT_2xyeUi3sT2naJ_7qEofGe4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "654963857570-utfm209evgrimgqj0m6ne5k1ro1neo1g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:654963857570:android:3aa06dc3d86cd510275ffb",
+        "android_client_info": {
+          "package_name": "com.mehtarohan.workingfirebase"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "654963857570-utfm209evgrimgqj0m6ne5k1ro1neo1g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCIasB_4cIT_2xyeUi3sT2naJ_7qEofGe4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "654963857570-utfm209evgrimgqj0m6ne5k1ro1neo1g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
