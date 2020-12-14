@@ -62,23 +62,25 @@ class _LoginPageState extends State<LoginPage> {
             .width,
         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
         onPressed: () async {
-          if (_login[username]['password'] == password) { // Checking for password
-            if (this.value) {
-              SharedPreferences prefs = await SharedPreferences.getInstance();
-              prefs.setString('username', username);
-              prefs.setString('password', _login[username]['password']);
-              prefs.setString('name', _login[username]['name']);
-              prefs.setInt('id', _login[username]['id']);
-            }
-            clearTextInput();
-            _pushList(_login[username]['name'], _login[username]['id']); //sending name and id of volunteer
-            username = '';
-            password = '';
-            if (message != ""){
-              setState(() {
-                message = "";
-              });
-            }
+          if (_login.keys.toList().contains(username) && _login[username]['password'] == password) {// Checking for password
+              if (value == true) {
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                prefs.setString('username', username);
+                prefs.setString('password', _login[username]['password']);
+                prefs.setString('name', _login[username]['name']);
+                prefs.setInt('id', _login[username]['id']);
+              }
+
+              clearTextInput();
+              _pushList(_login[username]['name'], _login[username]['id']); // sending name and id of volunteer
+              username = '';
+              password = '';
+
+              if (message != "") {
+                setState(() {
+                  message = '';
+                });
+              }
           }
           else {
             setState(() {
@@ -121,10 +123,10 @@ class _LoginPageState extends State<LoginPage> {
                 Row(children: [
                   Text("Remember Me"),
                   Checkbox(
-                    value: this.value,
+                    value: value,
                     onChanged: (bool val){
                       setState(() {
-                        this.value = val;
+                        value = val;
                       });
                     },
                   )],
@@ -144,20 +146,21 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  getData() {
-    Map info = {};
-    Firestore.instance.collection('volunteers').getDocuments().then((querySnapshot) {
+  Map getData() {
+    var info = {};
+    Firestore.instance.collection('volunteers').getDocuments().then((QuerySnapshot querySnapshot) {
       querySnapshot.documents.forEach((result) {
         info[result.data['username']] = {'id' : result.data['id'], 'name': result.data['name'], 'password': result.data['password']};
       });
     });
     return info;
   }
+
   _pushList(String user, int id) {
-    Navigator.of(context).push(
+    Navigator.of(context).pushReplacement(
         MaterialPageRoute(
             builder: (BuildContext context) {
-              return ClientList();
+              return ClientList(volName: user, volId: id);
             }
         )
     );

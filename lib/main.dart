@@ -4,11 +4,11 @@ import 'clientList.dart';
 import 'loginPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+
 Future<void> main() async{
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  var email = prefs.getString('email');
-  print(email);
+  var username = prefs.getString('username');
   var id  = prefs.getInt('id');
   var name = prefs.getString('name');
 
@@ -17,6 +17,7 @@ Future<void> main() async{
     theme: ThemeData(
         primarySwatch: Colors.blue
     ),
-    home: email ?? LoginPage() : ClientList(volId: id, volName: name),
-  ));
+    home: username == null ? LoginPage() : ClientList(volId: id, volName: name),
+    )
+  );
 }

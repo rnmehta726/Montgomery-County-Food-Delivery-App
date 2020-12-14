@@ -10,11 +10,14 @@ class ClientList extends StatefulWidget {
   ClientList({Key key, this.volName, this.volId}) : super(key: key);
 
   @override
-  _ClientListState createState() => _ClientListState();
+  _ClientListState createState() => _ClientListState(vName: volName, vid: volId);
 }
 
 class _ClientListState extends State<ClientList> {
-  final _saved = Set<String>();
+  final String vName;
+  final int vid;
+  _ClientListState({this.vName, this.vid});
+
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
@@ -51,8 +54,12 @@ class _ClientListState extends State<ClientList> {
     List<Map<String, dynamic>> values = [];
 
     for (var key in keys){
-      values.add(new Map<String, dynamic>.from(snapshot[key]));
+      var val = new Map<String, dynamic>.from(snapshot[key]);
+      if (val['volunteer_id'] == 0) {
+        values.add(new Map<String, dynamic>.from(snapshot[key]));
+      }
     }
+
     return ListView(
         padding: EdgeInsets.only(top: 15.0),
         children: values.map((data) => _buildRow(context, data, snapshot)).toList()
@@ -62,7 +69,7 @@ class _ClientListState extends State<ClientList> {
   Widget _buildRow(BuildContext context, Map<String, dynamic> document,  Map<String, dynamic> snapshot) {
     final record = Record.fromMap(document);
     var key = '';
-    final alreadyTaken = _saved.contains(record.name);
+    final alreadyTaken = document['volunteer_id']!=0;
     final name = record.name;
     final food = record.bags;
 
@@ -92,15 +99,14 @@ class _ClientListState extends State<ClientList> {
               alreadyTaken ? Icons.add_box_sharp : Icons.add_box_outlined,
               color: alreadyTaken ? Colors.green : null,
             ),
-            onTap: () {
-              setState(() {
-                _saved.add(name);
-              });
-              Timer(Duration(milliseconds: 150), (){
+            onTap: () async {
+              final newDoc = document;
+              newDoc['volunteer_id'] = vid;
+              await Firestore.instance.collection("baby").document('ABp6KzqnBppv2Qvkp6IW').updateData({key: newDoc});
+              setState(() {});
+              Timer(Duration(milliseconds: 150), () {
                 showSnackBar(context, document, key);
-                setState(() async{
-                  await Firestore.instance.collection("baby").document('ABp6KzqnBppv2Qvkp6IW').updateData({key: FieldValue.delete()});
-                });
+                setState(() {});
               });
             }
         ),
@@ -108,23 +114,22 @@ class _ClientListState extends State<ClientList> {
     );
   }
 
-  undoDelete(name, key) {
-    setState(() async{
-      _saved.remove(name['name']);
-      await Firestore.instance.collection("baby").document('ABp6KzqnBppv2Qvkp6IW').updateData({key: name});
-    });
+  undoDelete(doc, key) async{
+    doc['volunteer_id'] = 0;
+    await Firestore.instance.collection("baby").document('ABp6KzqnBppv2Qvkp6IW').updateData({key: doc});
+    setState(() {});
   }
 
   //Change to Flashbar when doing asthetics
-  showSnackBar(BuildContext context, name, key) {
-    var nam = name['name'];
+  showSnackBar(BuildContext context, doc, key) {
+    var nam = doc['name'];
     _scaffoldKey.currentState.showSnackBar(SnackBar(
       content: Text('$nam added to your deliveries'),
       duration: Duration(milliseconds: 1500),
       action: SnackBarAction(
         label: "UNDO",
         onPressed: () {
-          undoDelete(name, key);
+          undoDelete(doc, key);
         },
       ),
     ));
@@ -134,14 +139,13 @@ class _ClientListState extends State<ClientList> {
     final String results = await Navigator.push(context,
       MaterialPageRoute(
           builder: (BuildContext context) {
-            return MyClients(clients: _saved.toList());
+            return MyClients(id: vid);
           }
       ),
     );
-    if (results != null) {
+    if (results != null){
       setState(() async{
-        _saved.remove(results);
-        await Firestore.instance.collection("baby").add({'name': '$results'});
+        await Firestore.instance.collection("baby").document('ABp6KzqnBppv2Qvkp6IW').updateData({'name': results});
       });
     }
   }
