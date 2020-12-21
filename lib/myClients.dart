@@ -14,46 +14,29 @@ class _MyClientsState extends State<MyClients> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('My Clients'),
-        centerTitle: true,
-      ),
-      body: _list(),
+    return FutureBuilder(
+        future: getData(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData){
+            return _list(snapshot.data);
+          }
+          return CircularProgressIndicator();
+        }
     );
   }
-
-
   // fix list builder
-  Widget _list() {
-    Future<Map> _saved = getData();
-    Map _v = {};
-    _saved.then((value) {
-      print(value);
-      for (var key in value.keys.toList()){
-        print(value[key]);
-        _v[key] = value[key];
-        print(_v.keys.toList());
-      }
-      List tiles = _v.entries.map((data) => _row(context, data.value, data.key)).toList();
-      setState(() {
-
-      });
-    });
-
+  Widget _list(Map v) {
     return ListView(
         padding: EdgeInsets.only(top: 15.0),
-        children: _v.entries.map((data) => _row(context, data.value, data.key)).toList()
+        children: v.entries.map((data) => _row(context, data.value, data.key)).toList()
     );
-
   }
 
   Widget _row(context, Map saved, String keys) {
     return Padding(
-      key: Key(keys),
       padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Dismissible(
-        key: Key(saved['name']),
+        key: UniqueKey(),
         onDismissed: (direction){
           if (direction == DismissDirection.endToStart) {
             setState(() {
@@ -94,7 +77,7 @@ class _MyClientsState extends State<MyClients> {
             border: Border.all(color: Colors.grey),
             borderRadius: BorderRadius.circular(5.0),
           ),
-          child:ListTile(title: Text(saved['name'], style: TextStyle(fontSize: 18)), subtitle: Text(saved['#_of_bags_of_food'].toString()))
+          child:ListTile(title: Text(saved['name'], style: TextStyle(fontSize: 18)), subtitle: Text(saved['# of bags of food'].toString()))
         ),
       )
     );
@@ -105,7 +88,7 @@ class _MyClientsState extends State<MyClients> {
     await Firestore.instance.collection('baby').document('ABp6KzqnBppv2Qvkp6IW').get().then((DocumentSnapshot ds) {
         for (var k in ds.data.keys.toList()){
           if (ds.data[k]['volunteer_id'] == vId) {
-            info[k] = {'volunteer_id': ds.data[k]['volunteer_id'], 'name': ds.data[k]['name'], '#_of_bags_of_food': ds.data[k]['# of bags of food']};
+            info[k] = {'volunteer_id': ds.data[k]['volunteer_id'], 'name': ds.data[k]['name'], '# of bags of food': ds.data[k]['# of bags of food']};
           }
         }
       }

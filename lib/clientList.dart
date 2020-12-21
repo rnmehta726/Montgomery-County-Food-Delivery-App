@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'record.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'myClients.dart';
 
 class ClientList extends StatefulWidget {
   final String volName;
@@ -18,24 +17,9 @@ class _ClientListState extends State<ClientList> {
   final int vid;
   _ClientListState({this.vName, this.vid});
 
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        key: _scaffoldKey,
-        appBar: AppBar(
-            centerTitle:true,
-            title: Text("List of Clients"),
-            actions: [
-              IconButton(icon: Icon(Icons.list), onPressed:() {
-                _scaffoldKey.currentState.hideCurrentSnackBar();
-                _pushClients(context);
-              }),
-            ]
-        ),
-        body: _stream(context)
-    );
+    return _stream(context);
   }
 
   Widget _stream(BuildContext context) {
@@ -123,9 +107,9 @@ class _ClientListState extends State<ClientList> {
   //Change to Flashbar when doing asthetics
   showSnackBar(BuildContext context, doc, key) {
     var nam = doc['name'];
-    _scaffoldKey.currentState.showSnackBar(SnackBar(
+    Scaffold.of(context).showSnackBar(SnackBar(
       content: Text('$nam added to your deliveries'),
-      duration: Duration(milliseconds: 1500),
+      duration: Duration(milliseconds: 3000),
       action: SnackBarAction(
         label: "UNDO",
         onPressed: () {
@@ -133,20 +117,5 @@ class _ClientListState extends State<ClientList> {
         },
       ),
     ));
-  }
-
-  void _pushClients(BuildContext context) async {
-    final String results = await Navigator.push(context,
-      MaterialPageRoute(
-          builder: (BuildContext context) {
-            return MyClients(id: vid);
-          }
-      ),
-    );
-    if (results != null){
-      setState(() async{
-        await Firestore.instance.collection("baby").document('ABp6KzqnBppv2Qvkp6IW').updateData({'name': results});
-      });
-    }
   }
 }

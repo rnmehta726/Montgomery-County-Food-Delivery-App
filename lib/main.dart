@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'clientList.dart';
-import 'loginPage.dart';
+import 'j.dart';
+import 'niceLogin.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 
@@ -17,7 +17,7 @@ Future<void> main() async{
     theme: ThemeData(
         primarySwatch: Colors.blue
     ),
-    home: username == null ? LoginPage() : ClientList(volId: id, volName: name),
+    home: username == null ? LoginScreen() : J(vid: id, vName: name),
     )
   );
 }
