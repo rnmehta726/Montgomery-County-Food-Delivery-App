@@ -11,8 +11,8 @@ class NavDrawer extends StatelessWidget {
         padding: EdgeInsets.zero,
         children: <Widget>[
           DrawerHeader(
-            child: Text('Side Bar', style: TextStyle(color: Colors.black, fontSize: 25)),
-            decoration: BoxDecoration(color: Colors.green)
+            child: Align(alignment: Alignment.topCenter ,child: Text('Menu', style: TextStyle(color: Colors.white, fontSize: 25))),
+            decoration: BoxDecoration(color: Color(0xFF33691E))
           ),
           Column(children: tiles,)
         ],

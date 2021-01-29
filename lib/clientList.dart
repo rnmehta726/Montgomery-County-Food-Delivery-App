@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'dart:async';
 import 'record.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,13 +10,14 @@ class ClientList extends StatefulWidget {
   ClientList({Key key, this.volName, this.volId}) : super(key: key);
 
   @override
-  _ClientListState createState() => _ClientListState(vName: volName, vid: volId);
+  _ClientListState createState() => _ClientListState(vName: volName, vId: volId);
+
 }
 
 class _ClientListState extends State<ClientList> {
   final String vName;
-  final int vid;
-  _ClientListState({this.vName, this.vid});
+  final int vId;
+  _ClientListState({this.vName, this.vId});
 
   @override
   Widget build(BuildContext context) {
@@ -24,20 +26,23 @@ class _ClientListState extends State<ClientList> {
 
   Widget _stream(BuildContext context) {
     return StreamBuilder<DocumentSnapshot>(
-        stream: Firestore.instance.collection('baby').document('ABp6KzqnBppv2Qvkp6IW').snapshots(),
-        builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-          if(!snapshot.hasData) return LinearProgressIndicator();
+        stream: Firestore.instance
+            .collection('orders')
+            .document('SQujodVWeKgohCENPueX')
+            .snapshots(),
+        builder:
+            (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+          if (!snapshot.hasData) return LinearProgressIndicator();
           var firestoreData = snapshot.data.data;
           return _foodRecipients(context, firestoreData);
-        }
-    );
+        });
   }
 
   Widget _foodRecipients(BuildContext context, Map<String, dynamic> snapshot) {
     List<String> keys = snapshot.keys.toList();
     List<Map<String, dynamic>> values = [];
 
-    for (var key in keys){
+    for (var key in keys) {
       var val = new Map<String, dynamic>.from(snapshot[key]);
       if (val['volunteer_id'] == 0) {
         values.add(new Map<String, dynamic>.from(snapshot[key]));
@@ -45,20 +50,21 @@ class _ClientListState extends State<ClientList> {
     }
 
     return ListView(
-        padding: EdgeInsets.only(top: 15.0),
-        children: values.map((data) => _buildRow(context, data, snapshot)).toList()
-    );
+        padding: EdgeInsets.only(top: 0.0),
+        children:
+            values.map((data) => _buildRow(context, data, snapshot)).toList());
   }
 
-  Widget _buildRow(BuildContext context, Map<String, dynamic> document,  Map<String, dynamic> snapshot) {
+  Widget _buildRow(BuildContext context, Map<String, dynamic> document,
+      Map<String, dynamic> snapshot) {
     final record = Record.fromMap(document);
     var key = '';
-    final alreadyTaken = document['volunteer_id']!=0;
+    final alreadyTaken = document['volunteer_id'] != 0;
     final name = record.name;
     final food = record.bags;
 
-    for (var k in snapshot.keys.toList()){
-      if (snapshot[k].toString() == document.toString()){
+    for (var k in snapshot.keys.toList()) {
+      if (snapshot[k].toString() == document.toString()) {
         key = k;
         break;
       }
@@ -66,41 +72,40 @@ class _ClientListState extends State<ClientList> {
 
     return Padding(
       key: ValueKey(record.name),
-      padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      padding: EdgeInsets.symmetric(horizontal: 0, vertical: 0.5),
       child: Container(
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey),
-          borderRadius: BorderRadius.circular(5.0),
+          border: Border.all(color: Colors.black),
         ),
         child: ListTile(
-            title: Text(
-                name, style: TextStyle(fontSize: 18)
-            ),
-            subtitle: Text(
-                food.toString(), style:TextStyle(fontSize: 12)
-            ),
+            title: Text(name, style: TextStyle(fontSize: 18)),
+            subtitle: Text(food.toString(), style: TextStyle(fontSize: 12)),
             trailing: Icon(
               alreadyTaken ? Icons.add_box_sharp : Icons.add_box_outlined,
               color: alreadyTaken ? Colors.green : null,
             ),
             onTap: () async {
               final newDoc = document;
-              newDoc['volunteer_id'] = vid;
-              await Firestore.instance.collection("baby").document('ABp6KzqnBppv2Qvkp6IW').updateData({key: newDoc});
+              newDoc['volunteer_id'] = vId;
+              await Firestore.instance
+                  .collection("orders")
+                  .document('SQujodVWeKgohCENPueX')
+                  .updateData({key: newDoc});
               setState(() {});
               Timer(Duration(milliseconds: 150), () {
                 showSnackBar(context, document, key);
                 setState(() {});
               });
-            }
-        ),
+            }),
       ),
     );
   }
-
-  undoDelete(doc, key) async{
+  undoDelete(doc, key) async {
     doc['volunteer_id'] = 0;
-    await Firestore.instance.collection("baby").document('ABp6KzqnBppv2Qvkp6IW').updateData({key: doc});
+    await Firestore.instance
+        .collection("orders")
+        .document('SQujodVWeKgohCENPueX')
+        .updateData({key: doc});
     setState(() {});
   }
 
@@ -119,3 +124,4 @@ class _ClientListState extends State<ClientList> {
     ));
   }
 }
+

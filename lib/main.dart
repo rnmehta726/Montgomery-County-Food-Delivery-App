@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'j.dart';
+import 'mainPage.dart';
 import 'niceLogin.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:animated_splash_screen/animated_splash_screen.dart';
 
 Future<void> main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,10 +14,12 @@ Future<void> main() async{
 
   runApp(MaterialApp(
     title: "Montgomery Country Food Bank Meal Delivery",
-    theme: ThemeData(
-        primarySwatch: Colors.blue
-    ),
-    home: username == null ? LoginScreen() : J(vid: id, vName: name),
+    home: AnimatedSplashScreen(
+        duration: 2500,
+        splash: Image.asset('assets/mcfb_logo.png', height: 500, width: 500),
+        nextScreen: username == null ? LoginScreen() : J(vid: id, vName: name),
+        splashTransition: SplashTransition.fadeTransition,
+      )
     )
   );
 }

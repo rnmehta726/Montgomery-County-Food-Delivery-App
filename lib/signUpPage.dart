@@ -4,7 +4,14 @@ import 'mainPage.dart';
 import 'package:flutter/services.dart';
 import 'login_ui/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
+/*
+DISREGARD THIS PAGE FOR NOW.
+WE WILL CONTINUE WORKING ON THIS AFTER WE GET
+MORE INFORMATION FROM MCFB ON HOW
+THEY WANT TO HANDLE THE VOLUNTEER SIGN UP AND
+VERIFICATION.
+*/
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -12,11 +19,11 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  bool _rememberMe = false;
   String _username = '';
   String _password = '';
-  String _message = '';
+  String _verifyPassword = '';
   final _passwordController = TextEditingController();
+  final _verifyPasswordController = TextEditingController();
   final _usernameController = TextEditingController();
 
   Widget _buildEmailTF() {
@@ -95,66 +102,52 @@ class _LoginScreenState extends State<LoginScreen> {
     return _passwordField;
   }
 
-  Widget _buildRememberMeCheckbox() {
-    return Container(
-      height: 50.0,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Theme(
-            data: ThemeData(unselectedWidgetColor: Colors.white),
-            child: Checkbox(
-              value: _rememberMe,
-              checkColor: Colors.green,
-              activeColor: Colors.white,
-              onChanged: (value) {
-                setState(() {
-                  _rememberMe = value;
-                });
-              },
+  Widget _buildVerifyPasswordTF() {
+    final _passwordField = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          'Verify Password',
+          style: kLabelStyle,
+        ),
+        SizedBox(height: 10.0),
+        Container(
+          alignment: Alignment.centerLeft,
+          decoration: kBoxDecorationStyle,
+          height: 60.0,
+          child: TextField(
+            controller: _verifyPasswordController,
+            obscureText: true,
+            style: TextStyle(
+              color: Colors.white,
+              fontFamily: 'OpenSans',
             ),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.only(top: 14.0),
+              prefixIcon: Icon(
+                Icons.lock,
+                color: Colors.white,
+              ),
+              hintText: 'Re-enter your password',
+              hintStyle: kHintTextStyle,
+            ),
+            onChanged: (value) => _verifyPassword = value,
           ),
-          Text(
-            'Remember me',
-            style: kLabelStyle,
-          ),
-        ],
-      ),
+        ),
+      ],
     );
+    return _passwordField;
   }
 
-  Widget _buildLoginBtn() {
-    Map _login = getData();
+  Widget _buildSignUpBtn() {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 10.0),
       width: double.infinity,
       child: RaisedButton(
         elevation: 5.0,
         onPressed: () async {
-          if (_login.keys.toList().contains(_username) && _login[_username]['password'] == _password) {// Checking for password
-            if (_rememberMe == true) {
-              SharedPreferences prefs = await SharedPreferences.getInstance();
-              prefs.setString('username', _username);
-              prefs.setString('password', _login[_username]['password']);
-              prefs.setString('name', _login[_username]['name']);
-              prefs.setInt('id', _login[_username]['id']);
-            }
 
-            _pushList(_login[_username]['name'], _login[_username]['id']); // sending name and id of volunteer
-            _username = '';
-            _password = '';
-
-            if (_message != "") {
-              setState(() {
-                _message = '';
-              });
-            }
-          }
-          else {
-            setState(() {
-              _message = "Invalid Login Credentials!";
-            });
-          }
         },
         padding: EdgeInsets.all(15.0),
         shape: RoundedRectangleBorder(
@@ -162,7 +155,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         color: Colors.white,
         child: Text(
-          'LOGIN',
+          'SIGN UP',
           style: TextStyle(
             color: Color(0xFF689F38),
             letterSpacing: 1.5,
@@ -173,21 +166,6 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
-  }
-
-  Map getData() {
-    var info = {};
-    Firestore.instance.collection('volunteers').getDocuments().then((
-        QuerySnapshot querySnapshot) {
-      querySnapshot.documents.forEach((result) {
-        info[result.data['username']] = {
-          'id': result.data['id'],
-          'name': result.data['name'],
-          'password': result.data['password']
-        };
-      });
-    });
-    return info;
   }
 
   _pushList(String user, int id) {
@@ -239,7 +217,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       Text(
-                        'Sign In',
+                        'Sign Up',
                         style: TextStyle(
                           color: Colors.white,
                           fontFamily: 'OpenSans',
@@ -251,18 +229,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       _buildEmailTF(),
                       SizedBox(height: 14.0,),
                       _buildPasswordTF(),
-                      _buildRememberMeCheckbox(),
-                      _buildLoginBtn(),
-                      SizedBox(height: 14.0,),
-                      RichText(
-                        text: TextSpan(
-                            text: 'Sign Up',
-                            style: TextStyle(color: Colors.white, fontFamily: 'OpenSans', fontSize: 18),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                print('sign up');
-                              }),
-                      )
+                      _buildVerifyPasswordTF(),
+                      _buildSignUpBtn(),
                     ],
                   ),
                 ),
