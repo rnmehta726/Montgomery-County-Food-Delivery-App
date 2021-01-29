@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'clientInfo.dart';
+import 'clientInfor.dart';
 
 class MyClients extends StatefulWidget {
   final int id;

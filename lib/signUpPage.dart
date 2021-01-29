@@ -1,6 +1,6 @@
 import 'package:flutter/gestures.dart';
 import "package:flutter/material.dart";
-import 'mainPage.dart';
+import 'mainNav.dart';
 import 'package:flutter/services.dart';
 import 'login_ui/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
