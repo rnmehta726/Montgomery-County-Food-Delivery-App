@@ -36,22 +36,18 @@ class _MyClientsState extends State<MyClients> {
 
   Widget _row(context, Map saved, String keys) {
     var name2 = saved['name'];
-    var food = saved['# of bags of food'].toString();
+    var address = saved['address'];
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.5),
-      child: Padding(
-        key: UniqueKey(),
-        padding: EdgeInsets.symmetric(horizontal: 0.5, vertical: 0),
+      padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
         child: Container(
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.black)
+            border: Border.all(color: Colors.grey)
           ),
           child: ListTile(
             title: Text(name2),
-            subtitle: Text(food + ' Bags of Food'),
+            subtitle: Text(address),
             onTap: () async {
-              await Navigator.push(
-                  context,
+              await Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => ClientInfo(id: vId, name: name2)
               )
               );
@@ -59,8 +55,7 @@ class _MyClientsState extends State<MyClients> {
             },
           ),
         ),
-      ),
-    );
+      );
   }
 
   Future<Map> getData() async{
@@ -68,7 +63,7 @@ class _MyClientsState extends State<MyClients> {
     await Firestore.instance.collection('orders').document('SQujodVWeKgohCENPueX').get().then((DocumentSnapshot ds) {
         for (var k in ds.data.keys.toList()){
           if (ds.data[k]['volunteer_id'] == vId) {
-            info[k] = {'volunteer_id': ds.data[k]['volunteer_id'], 'name': ds.data[k]['name'], '# of bags of food': ds.data[k]['# of bags of food'], 'analyze': ds.data[k]['analyze']};
+            info[k] = {'volunteer_id': ds.data[k]['volunteer_id'], 'name': ds.data[k]['name'], 'address': ds.data[k]['address'] +", "+ ds.data[k]['city']+", TX"};
           }
         }
       }

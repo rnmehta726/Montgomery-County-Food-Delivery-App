@@ -2,12 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Record {
   final String name;
-  final int bags;
+  final String city;
 
   Record.fromMap(Map<String, dynamic> map)
       : assert(map['name'] != null),
-        assert(map['# of bags of food'] != null),
-        bags = map['# of bags of food'],
+        assert(map['city'] != null),
+        city = map['city'],
         name = map['name'];
 
 

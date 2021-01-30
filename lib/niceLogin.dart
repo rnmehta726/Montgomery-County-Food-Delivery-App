@@ -262,7 +262,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               ..onTap = () {
                                 print('sign up');
                               }),
-                      )
+                      ),
+                      SizedBox(height: 14.0,),
+                      Text(_message, style: TextStyle(color: Colors.redAccent),)
                     ],
                   ),
                 ),

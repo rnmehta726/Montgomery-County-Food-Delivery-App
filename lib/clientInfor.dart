@@ -26,7 +26,8 @@ class _ClientInfoState extends State<ClientInfo> {
           } else {
             return CircularProgressIndicator();
           }
-        });
+        }
+    );
   }
 
   Widget _body(Map v) {
@@ -37,7 +38,7 @@ class _ClientInfoState extends State<ClientInfo> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(vName + "'s" + " Information"),
+        title: Text(vName + "'s Information"),
         backgroundColor: Color(0xFF33691E),
       ),
       body: Stack(

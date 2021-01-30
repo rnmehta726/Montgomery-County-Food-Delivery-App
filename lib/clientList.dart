@@ -61,7 +61,7 @@ class _ClientListState extends State<ClientList> {
     var key = '';
     final alreadyTaken = document['volunteer_id'] != 0;
     final name = record.name;
-    final food = record.bags;
+    final city = record.city;
 
     for (var k in snapshot.keys.toList()) {
       if (snapshot[k].toString() == document.toString()) {
@@ -72,14 +72,15 @@ class _ClientListState extends State<ClientList> {
 
     return Padding(
       key: ValueKey(record.name),
-      padding: EdgeInsets.symmetric(horizontal: 0, vertical: 0.5),
+      padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
       child: Container(
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.black),
+          border: Border.all(color: Colors.grey),
+          borderRadius: BorderRadius.circular(5.0),
         ),
         child: ListTile(
             title: Text(name, style: TextStyle(fontSize: 18)),
-            subtitle: Text(food.toString(), style: TextStyle(fontSize: 12)),
+            subtitle: Text(city, style: TextStyle(fontSize: 12)),
             trailing: Icon(
               alreadyTaken ? Icons.add_box_sharp : Icons.add_box_outlined,
               color: alreadyTaken ? Colors.green : null,
@@ -87,19 +88,18 @@ class _ClientListState extends State<ClientList> {
             onTap: () async {
               final newDoc = document;
               newDoc['volunteer_id'] = vId;
-              await Firestore.instance
-                  .collection("orders")
-                  .document('SQujodVWeKgohCENPueX')
-                  .updateData({key: newDoc});
+              await Firestore.instance.collection("orders").document('SQujodVWeKgohCENPueX').updateData({key: newDoc});
               setState(() {});
               Timer(Duration(milliseconds: 150), () {
                 showSnackBar(context, document, key);
                 setState(() {});
               });
-            }),
+            }
+        ),
       ),
     );
   }
+
   undoDelete(doc, key) async {
     doc['volunteer_id'] = 0;
     await Firestore.instance

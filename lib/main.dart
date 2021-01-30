@@ -14,6 +14,7 @@ Future<void> main() async{
 
   runApp(MaterialApp(
     title: "Montgomery Country Food Bank Meal Delivery",
+    debugShowCheckedModeBanner: false,
     home: AnimatedSplashScreen(
         duration: 2500,
         splash: Image.asset('assets/mcfb_logo.png', height: 500, width: 500),
