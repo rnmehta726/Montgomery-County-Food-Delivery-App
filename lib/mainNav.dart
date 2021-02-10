@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import "navDrawer.dart";
 import 'clientList.dart';
@@ -18,7 +19,6 @@ class J extends StatefulWidget {
   J({Key key, this.vName, this.vid}) : super(key: key);
 
   final drawerFragments = [
-    //new DrawerItem("Home Page", Icons.house),
     new DrawerItem("Client List", Icons.shopping_bag),
     new DrawerItem("My Clients", Icons.people_alt_rounded),
     new DrawerItem("Logout", Icons.logout),
@@ -29,6 +29,7 @@ class J extends StatefulWidget {
 }
 
 class _JState extends State<J>{
+  GlobalKey<ScaffoldState> _key = new GlobalKey<ScaffoldState>();
   final String name;
   final int id;
   _JState(this.name, this.id);
@@ -55,6 +56,7 @@ class _JState extends State<J>{
   }
 
   _onSelectFragment(int index) {
+
     setState(() => _selectedDrawerFragmentIndex = index);
     Navigator.of(context).pop();
   }
@@ -82,6 +84,7 @@ class _JState extends State<J>{
 
     if (_selectedDrawerFragmentIndex != 2) {
       return Scaffold(
+          key: _key,
           drawer: NavDrawer(drawerOptions),
           appBar: AppBar(
             backgroundColor: Color(0xFF33691E),

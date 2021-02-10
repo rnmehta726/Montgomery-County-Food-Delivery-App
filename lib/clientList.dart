@@ -32,7 +32,14 @@ class _ClientListState extends State<ClientList> {
             .snapshots(),
         builder:
             (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-          if (!snapshot.hasData) return LinearProgressIndicator();
+          if (!snapshot.hasData || snapshot.data.data == {}) {
+            return Padding(
+                padding: EdgeInsets.only(top: 16.0),
+                child: Align(
+                    child: Text('No clients found', style: TextStyle(fontSize: 18),),
+                    alignment: Alignment.topCenter)
+            );
+          }
           var firestoreData = snapshot.data.data;
           return _foodRecipients(context, firestoreData);
         });
@@ -51,8 +58,7 @@ class _ClientListState extends State<ClientList> {
 
     return ListView(
         padding: EdgeInsets.only(top: 0.0),
-        children:
-            values.map((data) => _buildRow(context, data, snapshot)).toList());
+        children: values.map((data) => _buildRow(context, data, snapshot)).toList());
   }
 
   Widget _buildRow(BuildContext context, Map<String, dynamic> document,
@@ -91,6 +97,7 @@ class _ClientListState extends State<ClientList> {
               await Firestore.instance.collection("orders").document('SQujodVWeKgohCENPueX').updateData({key: newDoc});
               setState(() {});
               Timer(Duration(milliseconds: 150), () {
+                Scaffold.of(context).hideCurrentSnackBar();
                 showSnackBar(context, document, key);
                 setState(() {});
               });
@@ -109,19 +116,20 @@ class _ClientListState extends State<ClientList> {
     setState(() {});
   }
 
-  //Change to Flashbar when doing asthetics
-  showSnackBar(BuildContext context, doc, key) {
+  SnackBar showSnackBar(BuildContext context, doc, key) {
     var nam = doc['name'];
-    Scaffold.of(context).showSnackBar(SnackBar(
+
+     Scaffold.of(context).showSnackBar(SnackBar(
       content: Text('$nam added to your deliveries'),
       duration: Duration(milliseconds: 3000),
       action: SnackBarAction(
-        label: "UNDO",
-        onPressed: () {
-          undoDelete(doc, key);
-        },
+      label: "UNDO",
+      onPressed: () {
+        undoDelete(doc, key);
+      },
       ),
-    ));
+    )
+    );
   }
 }
 

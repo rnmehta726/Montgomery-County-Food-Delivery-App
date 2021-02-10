@@ -22,7 +22,12 @@ class _MyClientsState extends State<MyClients> {
           if (snapshot.hasData){
             return _list(snapshot.data);
           }
-          return CircularProgressIndicator();
+          return Padding(
+              padding: EdgeInsets.only(top: 16.0),
+              child: Align(
+                  child: Text('No clients under your name', style: TextStyle(fontSize: 18),),
+                  alignment: Alignment.topCenter)
+          );
         }
     );
   }
@@ -38,18 +43,18 @@ class _MyClientsState extends State<MyClients> {
     var name2 = saved['name'];
     var address = saved['address'];
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+        padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
         child: Container(
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey)
+            border: Border.all(color: Colors.grey),
+            borderRadius: BorderRadius.circular(5.0)
           ),
           child: ListTile(
             title: Text(name2),
             subtitle: Text(address),
             onTap: () async {
               await Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => ClientInfo(id: vId, name: name2)
-              )
+                  MaterialPageRoute(builder: (context) => ClientInfo(id: vId, name: name2))
               );
               setState(() {});
             },
@@ -59,7 +64,7 @@ class _MyClientsState extends State<MyClients> {
   }
 
   Future<Map> getData() async{
-    var info = {};
+    Map info = {};
     await Firestore.instance.collection('orders').document('SQujodVWeKgohCENPueX').get().then((DocumentSnapshot ds) {
         for (var k in ds.data.keys.toList()){
           if (ds.data[k]['volunteer_id'] == vId) {

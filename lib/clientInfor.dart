@@ -101,8 +101,8 @@ class _ClientInfoState extends State<ClientInfo> {
           backgroundColor: MaterialStateProperty.resolveWith<Color>(
                 (Set<MaterialState> states) {
               if (states.contains(MaterialState.pressed))
-                return Color(0xFF8BC34A);
-              return Color(0xFF33691E); // Use the component's default.
+                return Colors.white70;
+              return Colors.white; // Use the component's default.
             },
           ),
         ),
@@ -118,7 +118,7 @@ class _ClientInfoState extends State<ClientInfo> {
         },
         child: Text(
           'Remove Client',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Color(0xFF689F38)),
         ),
       ),
     );
@@ -132,8 +132,8 @@ class _ClientInfoState extends State<ClientInfo> {
           backgroundColor: MaterialStateProperty.resolveWith<Color>(
                 (Set<MaterialState> states) {
               if (states.contains(MaterialState.pressed))
-                return Color(0xFF8BC34A);
-              return Color(0xFF33691E); // Use the component's default.
+                return Colors.white70;
+              return Colors.white; // Use the component's default.
             },
           ),
         ),
@@ -148,7 +148,7 @@ class _ClientInfoState extends State<ClientInfo> {
         },
         child: Text(
           'Finish Client',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Color(0xFF689F38)),
         ),
       ),
     );
@@ -169,7 +169,7 @@ class _ClientInfoState extends State<ClientInfo> {
             '# of bags of food': ds.data[k]['# of bags of food'],
             'city': ds.data[k]['city'],
             'phoneNumber': ds.data[k]['phoneNumber'],
-            'street': ds.data[k]['street'],
+            'address': ds.data[k]['address'],
             'zipCode': ds.data[k]['zipCode']
           };
         }
