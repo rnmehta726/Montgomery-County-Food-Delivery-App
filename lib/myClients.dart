@@ -19,7 +19,7 @@ class _MyClientsState extends State<MyClients> {
     return FutureBuilder(
         future: getData(),
         builder: (context, snapshot) {
-          if (snapshot.hasData){
+          if (snapshot.hasData && snapshot.data != {}){
             return _list(snapshot.data);
           }
           return Padding(

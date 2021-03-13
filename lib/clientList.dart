@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'dart:async';
+import 'package:geolocator/geolocator.dart';
 import 'record.dart';
+import 'dart:math' as Math;
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:geocoder/geocoder.dart';
 
 class ClientList extends StatefulWidget {
   final String volName;
@@ -19,6 +22,9 @@ class _ClientListState extends State<ClientList> {
   final int vId;
   _ClientListState({this.vName, this.vId});
 
+  Position _currentPosition;
+  Coordinates _clientPosition;
+
   @override
   Widget build(BuildContext context) {
     return _stream(context);
@@ -30,8 +36,7 @@ class _ClientListState extends State<ClientList> {
             .collection('orders')
             .document('SQujodVWeKgohCENPueX')
             .snapshots(),
-        builder:
-            (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
           if (!snapshot.hasData || snapshot.data.data == {}) {
             return Padding(
                 padding: EdgeInsets.only(top: 16.0),
@@ -42,32 +47,61 @@ class _ClientListState extends State<ClientList> {
           }
           var firestoreData = snapshot.data.data;
           return _foodRecipients(context, firestoreData);
-        });
+        },
+    );
   }
 
   Widget _foodRecipients(BuildContext context, Map<String, dynamic> snapshot) {
     List<String> keys = snapshot.keys.toList();
     List<Map<String, dynamic>> values = [];
+    List<Widget> newValues = [];
+    List<double> distances = [];
+    Map<String,double> corresponding = {};
+    Map<String,Widget> rows = {};
 
     for (var key in keys) {
       var val = new Map<String, dynamic>.from(snapshot[key]);
       if (val['volunteer_id'] == 0) {
-        values.add(new Map<String, dynamic>.from(snapshot[key]));
+        values.add(val);
       }
     }
+    var _pos = _getCurrentLocation();
+    // values.map((data) async {
+    //   var row = _buildRow(context, data, snapshot);
+    //
+    //   await _getCurrentLocation();
+    //   double lat = _currentPosition.latitude;
+    //   double lon = _currentPosition.longitude;
+    //
+    //   String address = data['address']+", "+data['city']+", Texas";
+    //   await _GetClientCoords(address);
+    //
+    //   double howFarInKm = getDistanceFromLatLonInKm(lat,lon,clientPosition.latitude,clientPosition.longitude);
+    //   corresponding[data['name']] = howFarInKm;
+    //   rows[data['name']] = row;
+    //   distances.add(howFarInKm);
+    // });
+    //
+    // distances.sort();
+    // for (var d in distances) {
+    //   String k = corresponding.keys.firstWhere((element) => corresponding[element] == d, orElse: () => null);
+    //   var v = rows.values.firstWhere((element) => rows[k] == element, orElse: () => null);
+    //   newValues.add(v);
+    // }
 
     return ListView(
-        padding: EdgeInsets.only(top: 0.0),
-        children: values.map((data) => _buildRow(context, data, snapshot)).toList());
+      padding: EdgeInsets.only(top: 0.0),
+      children: values.map((data) => _buildRow(context, data, snapshot)).toList(),
+    );
   }
 
-  Widget _buildRow(BuildContext context, Map<String, dynamic> document,
-      Map<String, dynamic> snapshot) {
+  Widget _buildRow(BuildContext context, Map<String, dynamic> document, Map<String, dynamic> snapshot) {
     final record = Record.fromMap(document);
     var key = '';
     final alreadyTaken = document['volunteer_id'] != 0;
     final name = record.name;
     final city = record.city;
+    final zip = record.zip;
 
     for (var k in snapshot.keys.toList()) {
       if (snapshot[k].toString() == document.toString()) {
@@ -86,7 +120,7 @@ class _ClientListState extends State<ClientList> {
         ),
         child: ListTile(
             title: Text(name, style: TextStyle(fontSize: 18)),
-            subtitle: Text(city, style: TextStyle(fontSize: 12)),
+            subtitle: Text("$city $zip", style: TextStyle(fontSize: 12)),
             trailing: Icon(
               alreadyTaken ? Icons.add_box_sharp : Icons.add_box_outlined,
               color: alreadyTaken ? Colors.green : null,
@@ -131,5 +165,40 @@ class _ClientListState extends State<ClientList> {
     )
     );
   }
-}
 
+  Position _getCurrentLocation() {
+    final Geolocator geolocator = Geolocator();
+
+    geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.bestForNavigation)
+        .then((Position position) {
+          _currentPosition = position;
+    }).catchError((e) {
+      _currentPosition = Position(latitude: 0, longitude: 0);
+      print(e);
+    });
+  }
+
+  double getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
+    var R = 6371; // Radius of the earth in km
+    var dLat = deg2rad(lat2-lat1);  // deg2rad below
+    var dLon = deg2rad(lon2-lon1);
+    var a =
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+                Math.sin(dLon/2) * Math.sin(dLon/2)
+    ;
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    var d = R * c; // Distance in km
+    return d;
+  }
+
+  double deg2rad(deg) {
+    return deg * (Math.pi/180);
+  }
+
+  void _GetClientCoords(String address) async{
+    var addresses = await Geocoder.local.findAddressesFromQuery(address);
+    var first  = addresses.first;
+    _clientPosition = first.coordinates;
+  }
+}
