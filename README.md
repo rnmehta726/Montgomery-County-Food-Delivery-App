@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # testing_firebase2
 
 A new Flutter application.
@@ -14,3 +15,7 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter, view our
 [online documentation](https://flutter.dev/docs), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+=======
+# Montgomery-County-Food-Delivery-App
+A mobile app to streamline the process of connecting local volunteers to people in need who are unable to leave their homes to receive food due to COVID-19.
+>>>>>>> 29632ca2f473c8621f0cd5d33e6ab45409986356
