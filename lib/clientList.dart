@@ -1,3 +1,4 @@
+import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'dart:async';
@@ -22,9 +23,6 @@ class _ClientListState extends State<ClientList> {
   final int vId;
   _ClientListState({this.vName, this.vId});
 
-  Position _currentPosition;
-  Coordinates _clientPosition;
-
   @override
   Widget build(BuildContext context) {
     return _stream(context);
@@ -45,13 +43,34 @@ class _ClientListState extends State<ClientList> {
                     alignment: Alignment.topCenter)
             );
           }
+
           var firestoreData = snapshot.data.data;
-          return _foodRecipients(context, firestoreData);
+
+          return FutureProvider<Widget>(
+            create: (context) => _foodRecipients(context, firestoreData),
+            catchError: (context, e) {
+              print(e);
+              return Container(child: Align(
+                  alignment: Alignment.topCenter,
+                  child: Padding(padding: EdgeInsets.all(8.0),
+                    child: Text("Error getting clients",
+                      style: TextStyle(fontSize: 18),
+                    )),
+              ));
+            },
+            initialData: Container(
+              padding: EdgeInsets.only(top: 16.0),
+              child: Center(child: CircularProgressIndicator(),),
+            ),
+            child: Consumer<Widget>(builder:( context, Widget dtat, child) {
+              return dtat;
+            })
+          );
         },
     );
   }
 
-  Widget _foodRecipients(BuildContext context, Map<String, dynamic> snapshot) {
+  Future<Widget> _foodRecipients(BuildContext context, Map<String, dynamic> snapshot) async{
     List<String> keys = snapshot.keys.toList();
     List<Map<String, dynamic>> values = [];
     List<Widget> newValues = [];
@@ -65,34 +84,40 @@ class _ClientListState extends State<ClientList> {
         values.add(val);
       }
     }
-    var _pos = _getCurrentLocation();
-    // values.map((data) async {
-    //   var row = _buildRow(context, data, snapshot);
-    //
-    //   await _getCurrentLocation();
-    //   double lat = _currentPosition.latitude;
-    //   double lon = _currentPosition.longitude;
-    //
-    //   String address = data['address']+", "+data['city']+", Texas";
-    //   await _GetClientCoords(address);
-    //
-    //   double howFarInKm = getDistanceFromLatLonInKm(lat,lon,clientPosition.latitude,clientPosition.longitude);
-    //   corresponding[data['name']] = howFarInKm;
-    //   rows[data['name']] = row;
-    //   distances.add(howFarInKm);
-    // });
-    //
-    // distances.sort();
-    // for (var d in distances) {
-    //   String k = corresponding.keys.firstWhere((element) => corresponding[element] == d, orElse: () => null);
-    //   var v = rows.values.firstWhere((element) => rows[k] == element, orElse: () => null);
-    //   newValues.add(v);
-    // }
+
+    Position _currentPosition = await _getCurrentLocation();
+
+    for (var data in values) {
+      var row = _buildRow(context, data, snapshot);
+
+      double lat = _currentPosition.latitude;
+      double lon = _currentPosition.longitude;
+
+      String address = data['address'] + ", " + data['city'] + ", Texas";
+      
+      Coordinates _clientPosition = await _getClientCoords(address);
+
+      double howFarInKm = getDistanceFromLatLonInKm(lat, lon, _clientPosition.latitude, _clientPosition.longitude);
+      corresponding[data['name']] = howFarInKm;
+      rows[data['name']] = row;
+      distances.add(howFarInKm);
+    }
+
+    distances.sort();
+    for (var d in distances) {
+      String k = corresponding.keys.firstWhere((element) => corresponding[element] == d, orElse: () => null);
+      var v = rows.values.firstWhere((element) => rows[k] == element, orElse: () => null);
+      newValues.add(v);
+    }
 
     return ListView(
       padding: EdgeInsets.only(top: 0.0),
-      children: values.map((data) => _buildRow(context, data, snapshot)).toList(),
+      children: newValues,
     );
+    // return ListView(
+    //   padding: EdgeInsets.only(top: 0.0),
+    //   children: values.map((data) => _buildRow(context, data, snapshot)).toList(),
+    // );
   }
 
   Widget _buildRow(BuildContext context, Map<String, dynamic> document, Map<String, dynamic> snapshot) {
@@ -166,16 +191,18 @@ class _ClientListState extends State<ClientList> {
     );
   }
 
-  Position _getCurrentLocation() {
+  Future<Position> _getCurrentLocation() async {
     final Geolocator geolocator = Geolocator();
 
-    geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.bestForNavigation)
+    await geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.bestForNavigation)
         .then((Position position) {
-          _currentPosition = position;
+          return position;
     }).catchError((e) {
-      _currentPosition = Position(latitude: 0, longitude: 0);
       print(e);
+      return Position(latitude: 0, longitude: 0);
     });
+
+    return Position(latitude: 0, longitude: 0);
   }
 
   double getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
@@ -196,9 +223,9 @@ class _ClientListState extends State<ClientList> {
     return deg * (Math.pi/180);
   }
 
-  void _GetClientCoords(String address) async{
+  Future<Coordinates> _getClientCoords(String address) async{
     var addresses = await Geocoder.local.findAddressesFromQuery(address);
     var first  = addresses.first;
-    _clientPosition = first.coordinates;
+    return first.coordinates;
   }
 }
