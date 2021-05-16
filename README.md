@@ -5,7 +5,7 @@ A mobile app to streamline the process of connecting local volunteers to people 
 * [Rohan Mehta](https://github.com/rnmehta726)
 * [Roshan Mehta](https://github.com/roshanmehta)
 * [Shreyas Vatts](https://github.com/VattsShreyas)
-* [Palash Palwar](https://github.com/pawarpp)
+* [Palash Pawar](https://github.com/pawarpp)
 
 ## How it Works
 ### App (Frontend)
